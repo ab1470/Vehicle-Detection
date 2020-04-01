@@ -8,23 +8,38 @@
 
 import Foundation
 import UIKit
+import Vision
+import ImageIO
 
 class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var mediaTableView: UITableView!
     @IBOutlet weak var helperLabel: UILabel!
-        
+    
     @IBOutlet weak var galleryButton: RoundedButton!
     @IBOutlet weak var cameraButton: RoundedButton!
     
     var imagePicker: ImagePicker!
-        
+    
     var media = [UIImage]() {
         didSet {
             helperLabel.isHidden = self.media.isEmpty ? false : true
         }
     }
-       
+    
+    lazy var detectionRequest: VNCoreMLRequest = {
+        do {
+            let model = try VNCoreMLModel(for: VehicleDetector().model)
+            
+            let request = VNCoreMLRequest(model: model, completionHandler: { [weak self] request, error in
+                self?.processDetection(for: request, error: error)
+            })
+            //            request.imageCropAndScaleOption = .centerCrop
+            return request
+        } catch {
+            fatalError("Failed to load Vision ML model: \(error)")
+        }
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +51,7 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.mediaTableView.register(ImageTableViewCell.self, forCellReuseIdentifier: "ImageTableViewCell")
         
         helperLabel.isHidden = self.media.isEmpty ? false : true
+        
     }
     
     
@@ -84,14 +100,60 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     
+    
+    // MARK: - Vision Requests
+    func detectVehicles(in image: UIImage) {
+        //    classificationLabel.text = "Classifying..."
+        
+        guard let orientation = CGImagePropertyOrientation(rawValue: UInt32(image.imageOrientation.rawValue)) else { return }
+        guard let ciImage = CIImage(image: image) else { fatalError("Unable to create \(CIImage.self) from \(image).") }
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            let handler = VNImageRequestHandler(ciImage: ciImage, orientation: orientation)
+            do {
+                try handler.perform([self.detectionRequest])
+            } catch {
+                print("Failed to perform the vehicle detection request.\n\(error.localizedDescription)")
+            }
+        }
+    }
+    
+    /// Updates the UI with the results of the classification.
+    /// - Tag: ProcessClassifications
+    func processDetection(for request: VNRequest, error: Error?) {
+        DispatchQueue.main.async {
+            guard let results = request.results else {
+                //            self.classificationLabel.text = "Unable to classify image.\n\(error!.localizedDescription)"
+                return
+            }
+            
+            let observations = results as! [VNRecognizedObjectObservation]
+            
+            if observations.isEmpty {
+                //            self.classificationLabel.text = "Nothing recognized."
+            } else {
+                print(observations.count)
+                print(observations[0])
+                // Display top classifications ranked by confidence in the UI.
+                //            let topClassifications = classifications.prefix(2)
+                //            let descriptions = topClassifications.map { classification in
+                //                // Formats the classification for display; e.g. "(0.37) cliff, drop, drop-off".
+                //               return String(format: "  (%.2f) %@", classification.confidence, classification.identifier)
+                //            }
+                //            self.classificationLabel.text = "Classification:\n" + descriptions.joined(separator: "\n")
+            }
+        }
+    }
+    
 }
 
-
+// MARK: - Select Image
 extension ImageViewController: ImagePickerDelegate {
     func didSelect(_ image: UIImage?) {
         guard let image = image else { return }
         media.insert(image, at: 0)
         mediaTableView.reloadSections([0], with: .automatic)
+        detectVehicles(in: image)
     }
     
 }

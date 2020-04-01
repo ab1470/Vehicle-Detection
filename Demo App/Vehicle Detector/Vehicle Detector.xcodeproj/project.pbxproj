@@ -20,6 +20,8 @@
 		490F5D272435140E003AE5E8 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D262435140E003AE5E8 /* UIImage+Extension.swift */; };
 		490F5D29243514CF003AE5E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D28243514CF003AE5E8 /* SceneDelegate.swift */; };
 		490F5D2B24351939003AE5E8 /* UITableView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D2A24351939003AE5E8 /* UITableView+Ext.swift */; };
+		490F5D2E2435209D003AE5E8 /* VehicleDetector.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D2D2435209D003AE5E8 /* VehicleDetector.mlmodel */; };
+		490F5D30243521EE003AE5E8 /* VehicleRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D2F243521EE003AE5E8 /* VehicleRecognizer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +40,8 @@
 		490F5D262435140E003AE5E8 /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		490F5D28243514CF003AE5E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		490F5D2A24351939003AE5E8 /* UITableView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Ext.swift"; sourceTree = "<group>"; };
+		490F5D2D2435209D003AE5E8 /* VehicleDetector.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = VehicleDetector.mlmodel; sourceTree = "<group>"; };
+		490F5D2F243521EE003AE5E8 /* VehicleRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleRecognizer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +74,7 @@
 		490F5D0424344CD2003AE5E8 /* Vehicle Detector */ = {
 			isa = PBXGroup;
 			children = (
+				490F5D2C24352087003AE5E8 /* MLModels */,
 				490F5D2524350F3F003AE5E8 /* Views */,
 				490F5D202434FCA0003AE5E8 /* Controller */,
 				490F5D1B243468EE003AE5E8 /* Extensions */,
@@ -98,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				490F5D212434FCAA003AE5E8 /* ImagePicker.swift */,
+				490F5D2F243521EE003AE5E8 /* VehicleRecognizer.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -110,6 +116,14 @@
 				490F5D2324350F3A003AE5E8 /* ImageTableViewCell.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		490F5D2C24352087003AE5E8 /* MLModels */ = {
+			isa = PBXGroup;
+			children = (
+				490F5D2D2435209D003AE5E8 /* VehicleDetector.mlmodel */,
+			);
+			path = MLModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -189,6 +203,8 @@
 				490F5D0C24344CD2003AE5E8 /* ImageViewController.swift in Sources */,
 				490F5D272435140E003AE5E8 /* UIImage+Extension.swift in Sources */,
 				490F5D0A24344CD2003AE5E8 /* ARViewController.swift in Sources */,
+				490F5D30243521EE003AE5E8 /* VehicleRecognizer.swift in Sources */,
+				490F5D2E2435209D003AE5E8 /* VehicleDetector.mlmodel in Sources */,
 				490F5D222434FCAA003AE5E8 /* ImagePicker.swift in Sources */,
 				490F5D2B24351939003AE5E8 /* UITableView+Ext.swift in Sources */,
 				490F5D0624344CD2003AE5E8 /* AppDelegate.swift in Sources */,
