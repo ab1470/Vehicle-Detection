@@ -21,7 +21,7 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var imagePicker: ImagePicker!
     
-    var media = [UIImage]() {
+    var media = [VehicleObject]() {
         didSet {
             helperLabel.isHidden = self.media.isEmpty ? false : true
         }
@@ -48,7 +48,7 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         self.mediaTableView.delegate = self
         self.mediaTableView.dataSource = self
-        self.mediaTableView.register(ImageTableViewCell.self, forCellReuseIdentifier: "ImageTableViewCell")
+//        self.mediaTableView.register(ImageCell.self, forCellReuseIdentifier: "ImageCell")
         
         helperLabel.isHidden = self.media.isEmpty ? false : true
         
@@ -78,16 +78,24 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = mediaTableView.dequeueReusableCell(withIdentifier: "ImageTableViewCell") as! ImageTableViewCell
+        let cell = mediaTableView.dequeueReusableCell(withIdentifier: "ImageCell") as! ImageCell
         
-        cell.mainImageView.image = media[indexPath.row]
+        let vehicleObject = media[indexPath.row]
+        let image = vehicleObject.image
+        
+        cell.vehicleImage.image = image
+        
+        cell.isProcessing = vehicleObject.isRecognizing ? true : false
+                
         return cell
     }
     
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let currentImage = media[indexPath.row]
-        let cropRatio = currentImage.getCropRatio()
+        let vehicleObject = media[indexPath.row]
+        let image = vehicleObject.image!
+        
+        let cropRatio = image.getCropRatio()
         
         return tableView.frame.width / cropRatio
     }
@@ -102,16 +110,20 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     
     // MARK: - Vision Requests
-    func detectVehicles(in image: UIImage) {
-        //    classificationLabel.text = "Classifying..."
+    func detectVehicles(for vehicleObject: VehicleObject) {
+        guard let vehicleImage = vehicleObject.image else { return }
         
-        guard let orientation = CGImagePropertyOrientation(rawValue: UInt32(image.imageOrientation.rawValue)) else { return }
-        guard let ciImage = CIImage(image: image) else { fatalError("Unable to create \(CIImage.self) from \(image).") }
+        vehicleObject.isRecognizing = true
+        mediaTableView.reloadData()
         
+        guard let orientation = CGImagePropertyOrientation(rawValue: UInt32(vehicleImage.imageOrientation.rawValue)) else { return }
+        guard let ciImage = CIImage(image: vehicleImage) else { fatalError("Unable to create \(CIImage.self) from \(vehicleImage).") }
+
         DispatchQueue.global(qos: .userInitiated).async {
             let handler = VNImageRequestHandler(ciImage: ciImage, orientation: orientation)
             do {
                 try handler.perform([self.detectionRequest])
+                self.finishDetection(for: vehicleObject)
             } catch {
                 print("Failed to perform the vehicle detection request.\n\(error.localizedDescription)")
             }
@@ -134,6 +146,7 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
             } else {
                 print(observations.count)
                 print(observations[0])
+                
                 // Display top classifications ranked by confidence in the UI.
                 //            let topClassifications = classifications.prefix(2)
                 //            let descriptions = topClassifications.map { classification in
@@ -145,16 +158,26 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     
+    fileprivate func finishDetection(for vehicleObject: VehicleObject) {
+        DispatchQueue.main.async {
+            vehicleObject.isRecognizing = false
+            self.mediaTableView.reloadData()
+        }
+    }
+    
 }
 
 // MARK: - Select Image
 extension ImageViewController: ImagePickerDelegate {
     func didSelect(_ image: UIImage?) {
         guard let image = image else { return }
-        media.insert(image, at: 0)
+        
+        let vehicleObject = VehicleObject(image: image)
+        media.insert(vehicleObject, at: 0)
+                
         mediaTableView.reloadSections([0], with: .automatic)
-        detectVehicles(in: image)
+        
+        detectVehicles(for: vehicleObject)
     }
     
 }
-
