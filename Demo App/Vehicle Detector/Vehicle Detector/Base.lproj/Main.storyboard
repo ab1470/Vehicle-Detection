@@ -15,23 +15,22 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="apf-As-04a">
+                            <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QhI-HP-6Ar">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="813"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                            </view>
+                            </arscnView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="apf-As-04a" secondAttribute="bottom" id="3p0-po-xzc"/>
-                            <constraint firstAttribute="top" secondItem="apf-As-04a" secondAttribute="top" id="JBq-In-KNq"/>
-                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="apf-As-04a" secondAttribute="trailing" id="OQ7-D4-bgW"/>
-                            <constraint firstItem="apf-As-04a" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" id="tLs-Ou-yPx"/>
+                            <constraint firstAttribute="top" secondItem="QhI-HP-6Ar" secondAttribute="top" id="0NP-8s-rFk"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="trailing" secondItem="QhI-HP-6Ar" secondAttribute="trailing" id="7Fb-lc-J3C"/>
+                            <constraint firstItem="QhI-HP-6Ar" firstAttribute="leading" secondItem="PQr-Ze-W5v" secondAttribute="leading" id="I9v-rC-a2R"/>
+                            <constraint firstItem="PQr-Ze-W5v" firstAttribute="bottom" secondItem="QhI-HP-6Ar" secondAttribute="bottom" id="PHw-Sx-14a"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="PQr-Ze-W5v"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="AR" image="arkit" catalog="system" id="acW-dT-cKf"/>
                     <connections>
-                        <outlet property="videoPreview" destination="apf-As-04a" id="xI0-PM-ugX"/>
+                        <outlet property="sceneView" destination="QhI-HP-6Ar" id="j7M-Wx-BSM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>

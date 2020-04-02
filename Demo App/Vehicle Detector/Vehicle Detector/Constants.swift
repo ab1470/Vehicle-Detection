@@ -15,19 +15,4 @@ enum Constants {
         static let secondaryColor = UIColor.secondarySystemBackground
     }
     
-//    enum FieldLabel {
-//        static let leftInset = CGFloat(16)
-////        static let backgroundColor = UIColor.secondarySystemBackground
-////        static let textColor = UIColor.label
-////        static let placeholderTextColor = UIColor.secondaryLabel
-//    }
-    
-//    enum Field {
-//        static let cornerRadius = CGFloat(16)
-//        static let leftInset = CGFloat(16)
-//        static let backgroundColor = UIColor.secondarySystemBackground
-//        static let textColor = UIColor.label
-//        static let placeholderTextColor = UIColor.secondaryLabel
-//    }
-    
 }

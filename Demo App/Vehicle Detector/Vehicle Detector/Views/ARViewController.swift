@@ -5,168 +5,173 @@
 //  Created by Andrew Balmer on 3/31/20.
 //  Copyright © 2020 Andrew Balmer. All rights reserved.
 //
-//  Code lightly adapted from
+//  Code lightly adapted from Apple's `MLDice` sample app
 
-import CoreMedia
+
 import UIKit
+import SceneKit
+import ARKit
 import Vision
+import PencilKit
 
+class ARViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 
-class ARViewController: UIViewController {
-    
-    @IBOutlet weak var videoPreview: UIView!
-    
-    var videoCapture: VideoCapture!
-    var currentBuffer: CVPixelBuffer?
-    
-    lazy var vehicleModel: VNCoreMLModel = {
-        do {
-            let model = try VNCoreMLModel(for: VehicleDetector().model)
-            // Use a threshold provider to specify custom thresholds for the object detector.
-            model.featureProvider = ThresholdProvider()
-            return model
-        } catch {
-            fatalError("Failed to load the Vision ML model: \(error)")
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+
+    /// Concurrent queue to be used for model predictions
+    let predictionQueue = DispatchQueue(label: "predictionQueue",
+                                        qos: .userInitiated,
+                                        attributes: [],
+                                        autoreleaseFrequency: .inherit,
+                                        target: nil)
+
+    /// The ARSceneView
+    @IBOutlet weak var sceneView: ARSCNView!
+
+    /// Layer used to host detectionOverlay layer
+    var rootLayer: CALayer!
+    /// The detection overlay layer used to render bounding boxes
+    var detectionOverlay: CALayer!
+
+    /// Whether the current frame should be skipped (in terms of model predictions)
+    var shouldSkipFrame = 0
+    /// How often (in terms of camera frames) should the app run predictions
+    let predictEvery = 3
+
+    /// Vision request for the detection model
+    var vehicleDetectionRequest: VNCoreMLRequest!
+
+    /// Flag used to decide whether to draw bounding boxes for detected objects
+    var showBoxes = true {
+        didSet {
+            if !showBoxes {
+                removeBoxes()
+            }
         }
-    }()
-    
-    lazy var visionRequest: VNCoreMLRequest = {
-        let request = VNCoreMLRequest(model: vehicleModel, completionHandler: {
-            [weak self] request, error in
-            self?.processObservations(for: request, error: error)
-        })
-        
-        // NOTE: If you use another crop/scale option, you must also change
-        // how the BoundingBoxView objects get scaled when they are drawn.
-        // Currently they assume the full input image is used.
-        request.imageCropAndScaleOption = .scaleFill
-        return request
-    }()
-    
-    let maxBoundingBoxViews = 6
-    var boundingBoxViews = [BoundingBoxView]()
-    
-    
+    }
+
+    /// Size of the camera image buffer (used for overlaying boxes)
+    var bufferSize: CGSize! {
+        didSet {
+            if bufferSize != nil {
+                if oldValue == nil {
+                    setupLayers()
+                } else if oldValue != bufferSize {
+                    updateDetectionOverlaySize()
+                }
+            }
+
+        }
+    }
+
+    /// The last known image orientation
+    /// When the image orientation changes, the buffer size used for rendering boxes needs to be adjusted
+    var lastOrientation: CGImagePropertyOrientation = .right
+    var lastObservations = [VNRecognizedObjectObservation]()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUpBoundingBoxViews()
-        setUpCamera()
-    }
-    
-    
-    func setUpBoundingBoxViews() {
-        for _ in 0..<maxBoundingBoxViews {
-            boundingBoxViews.append(BoundingBoxView())
+
+        // Set the view's delegate
+        sceneView.delegate = self
+
+        // Set the session's delegate
+        sceneView.session.delegate = self
+
+        // Create a new scene
+        let scene = SCNScene()
+
+        // Set the scene to the view
+        sceneView.scene = scene
+
+        // Get the root layer so in order to draw rectangles
+        rootLayer = sceneView.layer
+
+        // Load the detection models
+        /// - Tag: SetupVisionRequest
+        guard let detector = try? VNCoreMLModel(for: VehicleDetector().model) else {
+            print("Failed to load detector!")
+            return
         }
-    }
-    
-    
-    func setUpCamera() {
-        videoCapture = VideoCapture()
-        videoCapture.delegate = self
+
+        // Use a threshold provider to specify custom thresholds for the object detector.
+        detector.featureProvider = ThresholdProvider()
+
+        vehicleDetectionRequest = VNCoreMLRequest(model: detector) { [weak self] request, error in
+            self?.detectionRequestHandler(request: request, error: error)
+        }
         
-        videoCapture.setUp(sessionPreset: .hd1280x720) { success in
-            if success {
-                // Add the video preview into the UI.
-                if let previewLayer = self.videoCapture.previewLayer {
-                    self.videoPreview.layer.addSublayer(previewLayer)
-                    self.resizePreviewLayer()
-                }
-                
-                // Add the bounding box layers to the UI, on top of the video preview.
-                for box in self.boundingBoxViews {
-                    box.addToLayer(self.videoPreview.layer)
-                }
-                
-                // Once everything is set up, we can start capturing live video.
-                self.videoCapture.start()
-            }
+        vehicleDetectionRequest.imageCropAndScaleOption = .scaleFill
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        // Disable dimming for demo
+        UIApplication.shared.isIdleTimerDisabled = true
+
+        // Create a session configuration
+        let configuration = ARWorldTrackingConfiguration()
+
+        // Run the view's session
+        sceneView.session.run(configuration)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        // Pause the view's session
+        sceneView.session.pause()
+    }
+
+    func bounds(for observation: VNRecognizedObjectObservation) -> CGRect {
+        let boundingBox = observation.boundingBox
+        // Coordinate system is like macOS, origin is on bottom-left and not top-left
+
+        // The resulting bounding box from the prediction is a normalized bounding box with coordinates from bottom left
+        // It needs to be flipped along the y axis
+        let fixedBoundingBox = CGRect(x: boundingBox.origin.x,
+                                      y: 1.0 - boundingBox.origin.y - boundingBox.height,
+                                      width: boundingBox.width,
+                                      height: boundingBox.height)
+
+        // Return a flipped and scaled rectangle corresponding to the coordinates in the sceneView
+        return VNImageRectForNormalizedRect(fixedBoundingBox, Int(sceneView.frame.width), Int(sceneView.frame.height))
+    }
+
+    // MARK: - Vision Callbacks
+
+    /// Handles results from the detection requests
+    ///
+    /// - parameters:
+    ///     - request: The VNRequest that has been processed
+    ///     - error: A potential error that may have occurred
+    func detectionRequestHandler(request: VNRequest, error: Error?) {
+        // Perform several error checks before proceeding
+        if let error = error {
+            print("An error occurred with the vision request: \(error.localizedDescription)")
+            return
         }
-    }
-    
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        resizePreviewLayer()
-    }
-    
-    
-    func resizePreviewLayer() {
-        videoCapture.previewLayer?.frame = videoPreview.bounds
-    }
-    
-    
-    func predict(sampleBuffer: CMSampleBuffer) {
-        if currentBuffer == nil, let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
-            currentBuffer = pixelBuffer
-            
-            // Get additional info from the camera.
-            var options: [VNImageOption : Any] = [:]
-            if let cameraIntrinsicMatrix = CMGetAttachment(sampleBuffer, key: kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix, attachmentModeOut: nil) {
-                options[.cameraIntrinsics] = cameraIntrinsicMatrix
-            }
-            
-            let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .up, options: options)
-            do {
-                try handler.perform([self.visionRequest])
-            } catch {
-                print("Failed to perform Vision request: \(error)")
-            }
-            
-            currentBuffer = nil
+        guard let request = request as? VNCoreMLRequest else {
+            print("Vision request is not a VNCoreMLRequest")
+            return
         }
-    }
-    
-    
-    func processObservations(for request: VNRequest, error: Error?) {
-        DispatchQueue.main.async {
-            if let results = request.results as? [VNRecognizedObjectObservation] {
-                self.show(predictions: results)
-            } else {
-                self.show(predictions: [])
-            }
+        guard let observations = request.results as? [VNRecognizedObjectObservation] else {
+            print("Request did not return recognized objects: \(request.results?.debugDescription ?? "[No results]")")
+            return
         }
-    }
-    
-    
-    func show(predictions: [VNRecognizedObjectObservation]) {
-        for i in 0..<boundingBoxViews.count {
-            if i < predictions.count {
-                let prediction = predictions[i]
 
-                /*
-                 The predicted bounding box is in normalized image coordinates, with
-                 the origin in the lower-left corner.
-
-                 Scale the bounding box to the coordinate system of the video preview,
-                 which is as wide as the screen and has a 16:9 aspect ratio. The video
-                 preview also may be letterboxed at the top and bottom.
-
-                 Based on code from https://github.com/Willjay90/AppleFaceDetection
-
-                 NOTE: If you use a different .imageCropAndScaleOption, or a different
-                 video resolution, then you also need to change the math here!
-                 */
-
-                let width = view.bounds.width
-                let height = width * 16 / 9
-                let offsetY = (view.bounds.height - height) / 2
-                let scale = CGAffineTransform.identity.scaledBy(x: width, y: height)
-                let transform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: -height - offsetY)
-                let rect = prediction.boundingBox.applying(scale).applying(transform)
-                
-                // Show the bounding box.
-                boundingBoxViews[i].show(frame: rect, color: .blue)
-            } else {
-                boundingBoxViews[i].hide()
-            }
+        guard !observations.isEmpty else {
+            removeBoxes()
+            lastObservations = []
+            return
         }
-    }
-}
 
+        if showBoxes {
+            drawBoxes(observations: observations)
+        }
 
-extension ARViewController: VideoCaptureDelegate {
-    func videoCapture(_ capture: VideoCapture, didCaptureVideoFrame sampleBuffer: CMSampleBuffer) {
-        predict(sampleBuffer: sampleBuffer)
     }
 }

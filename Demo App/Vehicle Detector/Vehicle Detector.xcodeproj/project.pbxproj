@@ -27,8 +27,9 @@
 		490F5D3B2435697C003AE5E8 /* ThresholdProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D3A2435697C003AE5E8 /* ThresholdProvider.swift */; };
 		490F5D3D24356A39003AE5E8 /* BoundingBoxes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D3C24356A39003AE5E8 /* BoundingBoxes.swift */; };
 		490F5D3F2435808B003AE5E8 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D3E2435808B003AE5E8 /* ImageView.swift */; };
-		490F5D4124359B8C003AE5E8 /* VideoCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D4024359B8C003AE5E8 /* VideoCapture.swift */; };
-		490F5D432435A18A003AE5E8 /* BoundingBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D422435A18A003AE5E8 /* BoundingBoxView.swift */; };
+		490F5D452435A774003AE5E8 /* ARViewController+SessionHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D442435A774003AE5E8 /* ARViewController+SessionHandling.swift */; };
+		490F5D472435AA0A003AE5E8 /* ARViewController+BoundingBoxes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D462435AA0A003AE5E8 /* ARViewController+BoundingBoxes.swift */; };
+		490F5D492435AA75003AE5E8 /* GeometryUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D482435AA75003AE5E8 /* GeometryUtilities.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,8 +55,9 @@
 		490F5D3A2435697C003AE5E8 /* ThresholdProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThresholdProvider.swift; sourceTree = "<group>"; };
 		490F5D3C24356A39003AE5E8 /* BoundingBoxes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxes.swift; sourceTree = "<group>"; };
 		490F5D3E2435808B003AE5E8 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
-		490F5D4024359B8C003AE5E8 /* VideoCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCapture.swift; sourceTree = "<group>"; };
-		490F5D422435A18A003AE5E8 /* BoundingBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxView.swift; sourceTree = "<group>"; };
+		490F5D442435A774003AE5E8 /* ARViewController+SessionHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARViewController+SessionHandling.swift"; sourceTree = "<group>"; };
+		490F5D462435AA0A003AE5E8 /* ARViewController+BoundingBoxes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARViewController+BoundingBoxes.swift"; sourceTree = "<group>"; };
+		490F5D482435AA75003AE5E8 /* GeometryUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryUtilities.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,7 +121,6 @@
 			children = (
 				490F5D212434FCAA003AE5E8 /* ImagePicker.swift */,
 				490F5D2F243521EE003AE5E8 /* VehicleRecognizer.swift */,
-				490F5D4024359B8C003AE5E8 /* VideoCapture.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -128,11 +129,12 @@
 			isa = PBXGroup;
 			children = (
 				490F5D0B24344CD2003AE5E8 /* ImageViewController.swift */,
-				490F5D0924344CD2003AE5E8 /* ARViewController.swift */,
 				490F5D2324350F3A003AE5E8 /* ImageTableViewCell.swift */,
 				490F5D3524353F2B003AE5E8 /* ImageCell.swift */,
 				490F5D3E2435808B003AE5E8 /* ImageView.swift */,
-				490F5D422435A18A003AE5E8 /* BoundingBoxView.swift */,
+				490F5D0924344CD2003AE5E8 /* ARViewController.swift */,
+				490F5D442435A774003AE5E8 /* ARViewController+SessionHandling.swift */,
+				490F5D462435AA0A003AE5E8 /* ARViewController+BoundingBoxes.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -148,6 +150,7 @@
 		490F5D3724354203003AE5E8 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				490F5D482435AA75003AE5E8 /* GeometryUtilities.swift */,
 				490F5D3824354236003AE5E8 /* VehicleObject.swift */,
 				490F5D3A2435697C003AE5E8 /* ThresholdProvider.swift */,
 				490F5D3C24356A39003AE5E8 /* BoundingBoxes.swift */,
@@ -230,21 +233,22 @@
 				490F5D1F243469B2003AE5E8 /* Constants.swift in Sources */,
 				490F5D29243514CF003AE5E8 /* SceneDelegate.swift in Sources */,
 				490F5D3F2435808B003AE5E8 /* ImageView.swift in Sources */,
-				490F5D4124359B8C003AE5E8 /* VideoCapture.swift in Sources */,
 				490F5D3B2435697C003AE5E8 /* ThresholdProvider.swift in Sources */,
 				490F5D0C24344CD2003AE5E8 /* ImageViewController.swift in Sources */,
 				490F5D3D24356A39003AE5E8 /* BoundingBoxes.swift in Sources */,
 				490F5D272435140E003AE5E8 /* UIImage+Extension.swift in Sources */,
 				490F5D0A24344CD2003AE5E8 /* ARViewController.swift in Sources */,
 				490F5D30243521EE003AE5E8 /* VehicleRecognizer.swift in Sources */,
+				490F5D452435A774003AE5E8 /* ARViewController+SessionHandling.swift in Sources */,
 				490F5D2E2435209D003AE5E8 /* VehicleDetector.mlmodel in Sources */,
 				490F5D222434FCAA003AE5E8 /* ImagePicker.swift in Sources */,
 				490F5D3924354236003AE5E8 /* VehicleObject.swift in Sources */,
 				490F5D2B24351939003AE5E8 /* UITableView+Ext.swift in Sources */,
+				490F5D492435AA75003AE5E8 /* GeometryUtilities.swift in Sources */,
+				490F5D472435AA0A003AE5E8 /* ARViewController+BoundingBoxes.swift in Sources */,
 				490F5D0624344CD2003AE5E8 /* AppDelegate.swift in Sources */,
 				490F5D1D2434695E003AE5E8 /* RoundedButton.swift in Sources */,
 				490F5D3624353F2B003AE5E8 /* ImageCell.swift in Sources */,
-				490F5D432435A18A003AE5E8 /* BoundingBoxView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

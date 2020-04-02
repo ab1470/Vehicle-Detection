@@ -3,6 +3,8 @@ See LICENSE folder for this sample’s licensing information.
 
 Abstract:
 Class providing custom thresholds for the object detection model.
+ 
+Code lightly adapted from Apple's `MLDice` sample app
 */
 
 import CoreML
@@ -22,7 +24,7 @@ public class ThresholdProvider: MLFeatureProvider {
     /// background.
     open var values = [
         "iouThreshold": MLFeatureValue(double: 0.3),
-        "confidenceThreshold": MLFeatureValue(double: 0.4)
+        "confidenceThreshold": MLFeatureValue(double: 0.5)
     ]
     
     public init(){
