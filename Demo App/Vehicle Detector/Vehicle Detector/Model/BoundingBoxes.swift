@@ -81,35 +81,11 @@ extension VisionBBoxDrawable where Self: UIView {
                 self.detectionOverlay.addSublayer(shapeLayer)
             }
 
-//            self.updateLayerGeometry()
             CATransaction.commit()
         }
     }
+
     
-    /// Update layer geometry when needed
-    func updateLayerGeometry() {
-        DispatchQueue.main.async {
-            let bounds = self.bounds
-            var scale: CGFloat
-
-            let xScale: CGFloat = bounds.size.width / self.frame.height
-            let yScale: CGFloat = bounds.size.height / self.frame.width
-
-            scale = fmax(xScale, yScale)
-            if scale.isInfinite {
-                scale = 1.0
-            }
-            CATransaction.begin()
-            CATransaction.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
-
-            self.detectionOverlay.position = CGPoint(x: bounds.midX, y: bounds.midY)
-
-            CATransaction.commit()
-        }
-    }
-
-
-    /// Removes all bounding boxes from the screen
     func removeBoxes() {
         drawBoxes(for: [])
     }
