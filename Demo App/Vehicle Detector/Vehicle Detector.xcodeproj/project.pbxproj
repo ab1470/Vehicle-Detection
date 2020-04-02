@@ -24,6 +24,9 @@
 		490F5D30243521EE003AE5E8 /* VehicleRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D2F243521EE003AE5E8 /* VehicleRecognizer.swift */; };
 		490F5D3624353F2B003AE5E8 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D3524353F2B003AE5E8 /* ImageCell.swift */; };
 		490F5D3924354236003AE5E8 /* VehicleObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D3824354236003AE5E8 /* VehicleObject.swift */; };
+		490F5D3B2435697C003AE5E8 /* ThresholdProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D3A2435697C003AE5E8 /* ThresholdProvider.swift */; };
+		490F5D3D24356A39003AE5E8 /* BoundingBoxes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D3C24356A39003AE5E8 /* BoundingBoxes.swift */; };
+		490F5D3F2435808B003AE5E8 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490F5D3E2435808B003AE5E8 /* ImageView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +49,9 @@
 		490F5D2F243521EE003AE5E8 /* VehicleRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleRecognizer.swift; sourceTree = "<group>"; };
 		490F5D3524353F2B003AE5E8 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
 		490F5D3824354236003AE5E8 /* VehicleObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleObject.swift; sourceTree = "<group>"; };
+		490F5D3A2435697C003AE5E8 /* ThresholdProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThresholdProvider.swift; sourceTree = "<group>"; };
+		490F5D3C24356A39003AE5E8 /* BoundingBoxes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxes.swift; sourceTree = "<group>"; };
+		490F5D3E2435808B003AE5E8 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +126,7 @@
 				490F5D0924344CD2003AE5E8 /* ARViewController.swift */,
 				490F5D2324350F3A003AE5E8 /* ImageTableViewCell.swift */,
 				490F5D3524353F2B003AE5E8 /* ImageCell.swift */,
+				490F5D3E2435808B003AE5E8 /* ImageView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -136,6 +143,8 @@
 			isa = PBXGroup;
 			children = (
 				490F5D3824354236003AE5E8 /* VehicleObject.swift */,
+				490F5D3A2435697C003AE5E8 /* ThresholdProvider.swift */,
+				490F5D3C24356A39003AE5E8 /* BoundingBoxes.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -214,7 +223,10 @@
 				490F5D2424350F3A003AE5E8 /* ImageTableViewCell.swift in Sources */,
 				490F5D1F243469B2003AE5E8 /* Constants.swift in Sources */,
 				490F5D29243514CF003AE5E8 /* SceneDelegate.swift in Sources */,
+				490F5D3F2435808B003AE5E8 /* ImageView.swift in Sources */,
+				490F5D3B2435697C003AE5E8 /* ThresholdProvider.swift in Sources */,
 				490F5D0C24344CD2003AE5E8 /* ImageViewController.swift in Sources */,
+				490F5D3D24356A39003AE5E8 /* BoundingBoxes.swift in Sources */,
 				490F5D272435140E003AE5E8 /* UIImage+Extension.swift in Sources */,
 				490F5D0A24344CD2003AE5E8 /* ARViewController.swift in Sources */,
 				490F5D30243521EE003AE5E8 /* VehicleRecognizer.swift in Sources */,

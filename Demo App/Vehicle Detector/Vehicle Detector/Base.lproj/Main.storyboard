@@ -63,26 +63,44 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="250"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="IjU-wA-Jms">
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0jK-nJ-x4g" customClass="ImageView" customModule="Vehicle_Detector" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="414" height="250"/>
-                                                </imageView>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                </view>
+                                                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ag5-Zo-O63">
+                                                    <rect key="frame" x="0.0" y="0.0" width="414" height="250"/>
+                                                </view>
                                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="xgo-e8-INr">
                                                     <rect key="frame" x="188.5" y="106.5" width="37" height="37"/>
                                                     <color key="color" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                                 </activityIndicatorView>
+                                                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No automobiles found in this photo" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cNc-Uw-AJy">
+                                                    <rect key="frame" x="73.5" y="115" width="267.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="IjU-wA-Jms" secondAttribute="trailing" id="5DD-15-ubQ"/>
-                                                <constraint firstAttribute="bottom" secondItem="IjU-wA-Jms" secondAttribute="bottom" id="A9p-1Y-H4H"/>
+                                                <constraint firstAttribute="trailing" secondItem="0jK-nJ-x4g" secondAttribute="trailing" id="9c1-vg-uKc"/>
+                                                <constraint firstItem="Ag5-Zo-O63" firstAttribute="leading" secondItem="LDs-6X-dN4" secondAttribute="leading" id="9zA-mv-9kt"/>
+                                                <constraint firstItem="0jK-nJ-x4g" firstAttribute="top" secondItem="LDs-6X-dN4" secondAttribute="top" id="FfM-El-PJX"/>
                                                 <constraint firstItem="xgo-e8-INr" firstAttribute="centerY" secondItem="LDs-6X-dN4" secondAttribute="centerY" id="GxH-zR-Y2c"/>
-                                                <constraint firstItem="IjU-wA-Jms" firstAttribute="top" secondItem="LDs-6X-dN4" secondAttribute="top" id="HfP-l4-4Lh"/>
+                                                <constraint firstAttribute="trailing" secondItem="Ag5-Zo-O63" secondAttribute="trailing" id="KKi-KG-duA"/>
                                                 <constraint firstItem="xgo-e8-INr" firstAttribute="centerX" secondItem="LDs-6X-dN4" secondAttribute="centerX" id="ZRI-0X-gBY"/>
-                                                <constraint firstItem="IjU-wA-Jms" firstAttribute="leading" secondItem="LDs-6X-dN4" secondAttribute="leading" id="o5z-fM-6lz"/>
+                                                <constraint firstItem="cNc-Uw-AJy" firstAttribute="centerY" secondItem="LDs-6X-dN4" secondAttribute="centerY" id="ZzD-VJ-bEA"/>
+                                                <constraint firstItem="cNc-Uw-AJy" firstAttribute="centerX" secondItem="LDs-6X-dN4" secondAttribute="centerX" id="aLh-AQ-26g"/>
+                                                <constraint firstAttribute="bottom" secondItem="Ag5-Zo-O63" secondAttribute="bottom" id="hFz-CO-N2k"/>
+                                                <constraint firstAttribute="bottom" secondItem="0jK-nJ-x4g" secondAttribute="bottom" id="qYt-0k-i1e"/>
+                                                <constraint firstItem="Ag5-Zo-O63" firstAttribute="top" secondItem="LDs-6X-dN4" secondAttribute="top" id="vRS-Qn-T8i"/>
+                                                <constraint firstItem="0jK-nJ-x4g" firstAttribute="leading" secondItem="LDs-6X-dN4" secondAttribute="leading" id="yZs-Ks-Mu3"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="activityIndicator" destination="xgo-e8-INr" id="2n5-kN-dl2"/>
-                                            <outlet property="vehicleImage" destination="IjU-wA-Jms" id="WVr-qo-yQi"/>
+                                            <outlet property="imageContainer" destination="0jK-nJ-x4g" id="Vdu-KK-man"/>
+                                            <outlet property="imageOverlay" destination="Ag5-Zo-O63" id="pLY-pD-eHf"/>
+                                            <outlet property="noAutomobilesLabel" destination="cNc-Uw-AJy" id="upM-7B-4Nc"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

@@ -7,11 +7,12 @@
 //
 
 import UIKit
+import Vision
 
 class VehicleObject {
-    var isRecognizing: Bool = false
+    var isProcessing: Bool = false
     var image: UIImage!
-    var boundingBoxes: [CGRect] = []
+    var observations: [VNRecognizedObjectObservation]?
     
     init(image: UIImage) {
         self.image = image

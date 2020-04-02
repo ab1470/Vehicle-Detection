@@ -27,17 +27,14 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     
-    lazy var detectionRequest: VNCoreMLRequest = {
+    lazy var vehicleModel: VNCoreMLModel = {
         do {
             let model = try VNCoreMLModel(for: VehicleDetector().model)
-            
-            let request = VNCoreMLRequest(model: model, completionHandler: { [weak self] request, error in
-                self?.processDetection(for: request, error: error)
-            })
-            //            request.imageCropAndScaleOption = .centerCrop
-            return request
+            // Use a threshold provider to specify custom thresholds for the object detector.
+            model.featureProvider = ThresholdProvider()
+            return model
         } catch {
-            fatalError("Failed to load Vision ML model: \(error)")
+            fatalError("Failed to load the Vision ML model: \(error)")
         }
     }()
     
@@ -48,10 +45,8 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         self.mediaTableView.delegate = self
         self.mediaTableView.dataSource = self
-//        self.mediaTableView.register(ImageCell.self, forCellReuseIdentifier: "ImageCell")
         
         helperLabel.isHidden = self.media.isEmpty ? false : true
-        
     }
     
     
@@ -83,9 +78,17 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let vehicleObject = media[indexPath.row]
         let image = vehicleObject.image
         
-        cell.vehicleImage.image = image
+        cell.imageContainer.image = image
+        cell.isProcessing = vehicleObject.isProcessing ? true : false
         
-        cell.isProcessing = vehicleObject.isRecognizing ? true : false
+        if let observations = vehicleObject.observations {
+            if observations.isEmpty {
+                cell.noAutomobiles = true
+            } else {
+                cell.noAutomobiles = false
+                cell.imageContainer.drawBoxes(for: observations)
+            }
+        }
                 
         return cell
     }
@@ -112,71 +115,60 @@ class ImageViewController: UIViewController, UITableViewDelegate, UITableViewDat
     // MARK: - Vision Requests
     func detectVehicles(for vehicleObject: VehicleObject) {
         guard let vehicleImage = vehicleObject.image else { return }
-        
-        vehicleObject.isRecognizing = true
-        mediaTableView.reloadData()
-        
         guard let orientation = CGImagePropertyOrientation(rawValue: UInt32(vehicleImage.imageOrientation.rawValue)) else { return }
         guard let ciImage = CIImage(image: vehicleImage) else { fatalError("Unable to create \(CIImage.self) from \(vehicleImage).") }
-
+        
+        vehicleObject.isProcessing = true
+        mediaTableView.reloadData()
+        
+        let detectionRequest = VNCoreMLRequest(model: vehicleModel, completionHandler: { [weak self] request, error in
+            self?.processDetection(for: request, in: vehicleObject, error: error)
+        })
+        detectionRequest.imageCropAndScaleOption = .scaleFill
+        
         DispatchQueue.global(qos: .userInitiated).async {
             let handler = VNImageRequestHandler(ciImage: ciImage, orientation: orientation)
             do {
-                try handler.perform([self.detectionRequest])
-                self.finishDetection(for: vehicleObject)
+                try handler.perform([detectionRequest])
             } catch {
                 print("Failed to perform the vehicle detection request.\n\(error.localizedDescription)")
             }
         }
     }
     
-    /// Updates the UI with the results of the classification.
-    /// - Tag: ProcessClassifications
-    func processDetection(for request: VNRequest, error: Error?) {
+    
+    func processDetection(for request: VNRequest, in vehicleObj: VehicleObject, error: Error?) {
         DispatchQueue.main.async {
-            guard let results = request.results else {
-                //            self.classificationLabel.text = "Unable to classify image.\n\(error!.localizedDescription)"
-                return
+            defer {
+                vehicleObj.isProcessing = false
+                self.mediaTableView.reloadData()
             }
+            
+            guard let results = request.results else { return }
             
             let observations = results as! [VNRecognizedObjectObservation]
-            
+                        
             if observations.isEmpty {
-                //            self.classificationLabel.text = "Nothing recognized."
-            } else {
-                print(observations.count)
-                print(observations[0])
+                print("no automobiles found in photo")
+                vehicleObj.observations = []
                 
-                // Display top classifications ranked by confidence in the UI.
-                //            let topClassifications = classifications.prefix(2)
-                //            let descriptions = topClassifications.map { classification in
-                //                // Formats the classification for display; e.g. "(0.37) cliff, drop, drop-off".
-                //               return String(format: "  (%.2f) %@", classification.confidence, classification.identifier)
-                //            }
-                //            self.classificationLabel.text = "Classification:\n" + descriptions.joined(separator: "\n")
+            } else {
+                vehicleObj.observations = observations
             }
         }
     }
-    
-    fileprivate func finishDetection(for vehicleObject: VehicleObject) {
-        DispatchQueue.main.async {
-            vehicleObject.isRecognizing = false
-            self.mediaTableView.reloadData()
-        }
-    }
-    
+        
 }
 
 // MARK: - Select Image
 extension ImageViewController: ImagePickerDelegate {
     func didSelect(_ image: UIImage?) {
-        guard let image = image else { return }
+        guard var image = image else { return }
+        image = image.fixOrientation() ?? image
         
         let vehicleObject = VehicleObject(image: image)
         media.insert(vehicleObject, at: 0)
-                
-        mediaTableView.reloadSections([0], with: .automatic)
-        
+                        
         detectVehicles(for: vehicleObject)
     }
     

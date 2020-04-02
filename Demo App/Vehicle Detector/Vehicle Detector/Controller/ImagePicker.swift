@@ -60,12 +60,12 @@ open class ImagePicker: NSObject {
         }
         
         self.pickerController.sourceType = source
-        self.presentationController?.present(self.pickerController, animated: false)
+        self.presentationController?.present(self.pickerController, animated: true)
     }
     
         
     private func pickerController(_ controller: UIImagePickerController, didSelect image: UIImage?) {
-        controller.dismiss(animated: false, completion: nil)
+        controller.dismiss(animated: true, completion: nil)
         
         self.delegate?.didSelect(image)
     }
